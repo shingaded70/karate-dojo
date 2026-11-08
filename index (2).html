@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dojo Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f6;--surf:#fff;--ink:#16243b;--mute:#5d6b82;--line:#dbe1ec;--red:#b3202a;--redbg:#fbe6e7;--amber:#8a5a00;--amberbg:#fff1d6;--green:#1d6b3e;--greenbg:#dff3e6;--h1:#16243b;--h2:#2a4272;--shadow:0 6px 18px rgba(22,36,59,.08);
+box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1626;--surf:#18233a;--ink:#eaf0fa;--mute:#9aa8c0;--line:#2b3a57;--red:#ff7a82;--redbg:#3d1e26;--amber:#f2c36b;--amberbg:#3a2f14;--green:#6fd39a;--greenbg:#16372a;--h1:#0a101d;--h2:#1c2d52;--shadow:none;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1626;--surf:#18233a;--ink:#eaf0fa;--mute:#9aa8c0;--line:#2b3a57;--red:#ff7a82;--redbg:#3d1e26;--amber:#f2c36b;--amberbg:#3a2f14;--green:#6fd39a;--greenbg:#16372a;--h1:#0a101d;--h2:#1c2d52;--shadow:none;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Archivo",system-ui,-apple-system,"Segoe UI",sans-serif}
+header{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--h1),var(--h2));color:#fff;padding:calc(22px + env(safe-area-inset-top,0px)) 20px 70px}
+header::before{content:"";position:absolute;right:-50px;top:-50px;width:210px;height:210px;border-radius:50%;background:#c4222d;opacity:.92}
+header::after{content:"空手";position:absolute;right:26px;top:26px;font-size:2.7rem;font-weight:800;color:#fff;opacity:.9;letter-spacing:.05em}
+header div{position:relative;max-width:720px;margin:0 auto}
+header h1{margin:0;font-size:1.8rem;font-weight:800;letter-spacing:-.02em}
+header p{margin:4px 0 0;opacity:.75;font-size:.92rem}
+main{max-width:720px;margin:-46px auto 0;padding:0 16px 56px;position:relative}
+h2{font-size:1.05rem;font-weight:800;margin:24px 0 10px}
+nav{display:flex;gap:4px;background:var(--surf);border-radius:14px;padding:5px;box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:16px}
+nav button{flex:1;border:0;background:none;color:var(--mute);font:600 .95rem inherit;font-family:inherit;padding:11px 6px;border-radius:10px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--red);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:1.3rem;font-weight:800}
+.stat span{color:var(--mute);font-size:.8rem}
+.row{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow);flex-wrap:wrap}
+.row .who{min-width:0;flex:1 1 170px}
+.row .who b{display:block}
+.row .who small{color:var(--mute)}
+.open{cursor:pointer;border:0;text-align:left;width:100%;font:inherit;color:inherit}
+.av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--bg);flex:none;border:4px solid var(--line)}
+.av.big{width:64px;height:64px;font-size:1.4rem}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surf);color:var(--ink);font:600 .85rem inherit;font-family:inherit;padding:9px 12px;border-radius:10px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.pri{background:var(--red);border-color:var(--red);color:#fff}
+.btn.ok{background:var(--green);border-color:var(--green);color:var(--surf)}
+.tag{display:inline-block;font-size:.78rem;font-weight:600;padding:2px 9px;border-radius:99px}
+.late{background:var(--redbg);color:var(--red)}.soon{background:var(--amberbg);color:var(--amber)}.fine{background:var(--greenbg);color:var(--green)}
+.belt{display:inline-block;width:34px;height:8px;border-radius:2px;vertical-align:middle;margin-right:6px;border:1px solid var(--line)}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
+form.card{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+form.card label,.card label.f{display:flex;flex-direction:column;font-size:.8rem;color:var(--mute);gap:3px}
+.full{grid-column:1/-1}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
+.empty{color:var(--mute);padding:16px;text-align:center;border:1px dashed var(--line);border-radius:14px}
+.chk{cursor:pointer}.chk input{width:22px;height:22px}
+.big-n{font-size:2rem;font-weight:800;line-height:1.1}
+.inl{display:flex;gap:8px;align-items:end}.inl label{flex:1}
+.medals{display:flex;gap:12px;font-weight:800;margin-top:6px}
+.res{font-size:1.5rem}
+.back{margin-bottom:12px}.bars{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:12px}.bc{display:flex;flex-direction:column;align-items:center;font-size:.65rem;color:var(--mute);gap:2px}.bt{width:100%;height:70px;background:var(--bg);border-radius:6px;display:flex;align-items:flex-end;overflow:hidden}.bt i{display:block;width:100%;background:var(--red)}.yr{display:flex;justify-content:space-between;align-items:center}.cr{color:var(--green)}.dr{color:var(--red)}
+@media(max-width:440px){form.card{grid-template-columns:1fr}header::before{right:-70px}header h1{font-size:1.5rem}}
+</style>
+</head>
+<body>
+<header><div><h1>Dojo Manager</h1><p>Students, fees, attendance and tournaments</p></div></header>
+<main>
+<nav role="tablist">
+<button role="tab" data-t="fees" aria-selected="true">Fees</button>
+<button role="tab" data-t="students" aria-selected="false">Students</button>
+<button role="tab" data-t="att" aria-selected="false">Attendance</button>
+<button role="tab" data-t="acc" aria-selected="false">Accounts</button>
+</nav>
+<section id="view"></section>
+</main>
+<script>
+var KEY='dojo-manager-v1';
+var S={students:[],att:{},paid:{},rem:{}};
+try{var raw=localStorage.getItem(KEY);if(raw){S=Object.assign(S,JSON.parse(raw));}}catch(e){}
+S.ledger=S.ledger||[];S.amt=S.amt||{};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+var BELTS={White:'#f2f2f2',Yellow:'#f2d12e',Orange:'#f08a24',Green:'#2e9b4f',Blue:'#2a63c9',Brown:'#7a4a24',Black:'#111'};
+var PLACE={'1':'🥇 1st place','2':'🥈 2nd place','3':'🥉 3rd place','P':'Participated'};
+var tab='fees',sel=null,attDate=ymd(new Date()),attYear=new Date().getFullYear(),queue=[],qi=0,accM=ymd(new Date()).slice(0,7);
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function money(n){return '₹'+Number(n).toLocaleString('en-IN');}
+function dayStart(){var d=new Date();d.setHours(0,0,0,0);return d;}
+function fmt(d){return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+function find(id){return S.students.find(function(s){return s.id===id;});}
+var MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function pending(st){
+  var out=[],p=st.start.split('-').map(Number),y=p[0],m=p[1],now=dayStart(),lim=now.getTime()+3*864e5;
+  for(var i=0;i<240;i++){
+    var due=new Date(y,m-1,st.day),key=y+'-'+String(m).padStart(2,'0');
+    if(due.getTime()>lim)break;
+    if((S.paid[st.id]||[]).indexOf(key)<0)out.push({key:key,due:due,m:m-1,late:Math.round((now-due)/864e5)});
+    m++;if(m>12){m=1;y++;}
+  }
+  return out;
+}
+function remainingOf(st){return st.owed!=null?+st.owed:unpaidOf(st).length*(+st.fee);}
+function badge(late){
+  if(late>0)return '<span class="tag late">'+late+(late>1?' days':' day')+' overdue</span>';
+  if(late===0)return '<span class="tag late">Due today</span>';
+  return '<span class="tag soon">Due in '+(-late)+(late<-1?' days':' day')+'</span>';
+}
+function waLink(st,pd){
+  var ph=(st.phone||'').replace(/\D/g,'');if(ph.length===10)ph='91'+ph;
+  var msg='Hi, this is a reminder from the dojo. '+st.name+'’s karate fee of '+money(st.fee)+' for '+MN[pd.m]+' '+(pd.late>=0?'was due on ':'is due on ')+fmt(pd.due)+'. Please pay at your earliest. Thank you!';
+  return 'https://wa.me/'+ph+'?text='+encodeURIComponent(msg);
+}
+function msgOf(st,pd){return 'Hi, this is a reminder from the dojo. '+st.name+'’s karate fee of '+money(st.fee)+' for '+MN[pd.m]+' '+(pd.late>=0?'was due on ':'is due on ')+fmt(pd.due)+'. Please pay at your earliest. Thank you!';}
+function copyText(s,btn){
+  var ok=function(){btn.textContent='Copied';setTimeout(function(){btn.textContent='Copy message';},1500);};
+  function fb(){var ta=document.createElement('textarea');ta.value=s;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok();}catch(e){btn.textContent='Copy failed';}document.body.removeChild(ta);}
+  try{navigator.clipboard.writeText(s).then(ok,fb);}catch(e){fb();}
+}
+function phoneOf(st){var ph=(st.phone||'').replace(/\D/g,'');return ph.length===10?'91'+ph:ph;}
+function smsLink(st,pd){
+  var msg='Hi, this is a reminder from the dojo. '+st.name+'’s karate fee of '+money(st.fee)+' for '+MN[pd.m]+' '+(pd.late>=0?'was due on ':'is due on ')+fmt(pd.due)+'. Please pay at your earliest. Thank you!';
+  return 'sms:'+(phoneOf(st)?'+'+phoneOf(st):'')+'?&body='+encodeURIComponent(msg);
+}
+function dueList(){
+  var l=[];S.students.forEach(function(st){pending(st).forEach(function(pd){l.push({st:st,pd:pd});});});
+  l.sort(function(a,b){return b.pd.late-a.pd.late;});return l;
+}
+function queueHtml(){
+  var td=fmt(new Date());
+  if(queue.length){
+    if(qi>=queue.length)return '<div class="card"><b>All reminders done.</b><p style="margin:6px 0 10px;color:var(--mute)">Every student in the queue has been handled.</p><button class="btn pri" data-qquit="1">Close</button></div>';
+    var c=queue[qi],k=c.st.id+'|'+c.pd.key;
+    return '<div class="card"><b>Reminder '+(qi+1)+' of '+queue.length+'</b><p style="margin:6px 0 10px">'+esc(c.st.name)+' · '+MN[c.pd.m]+' · '+money(c.st.fee)+' '+badge(c.pd.late)+'</p><div class="acts"><a class="btn pri" target="_blank" rel="noopener" href="'+waLink(c.st,c.pd)+'" data-qsend="'+k+'">WhatsApp</a><a class="btn" target="_blank" rel="noopener" href="'+smsLink(c.st,c.pd)+'" data-qsend="'+k+'">SMS</a><button class="btn" data-copy="'+esc(msgOf(c.st,c.pd))+'">Copy message</button><button class="btn" data-qskip="1">Skip</button><button class="btn" data-qquit="1">Stop</button></div></div>';
+  }
+  var n=dueList().filter(function(x){return x.st.phone&&S.rem[x.st.id+'|'+x.pd.key]!==td;}).length;
+  return n?'<button class="btn pri" style="width:100%;margin-bottom:6px" data-qstart="1">Send reminders one by one ('+n+')</button>':'';
+}
+function bdayList(){
+  var n=dayStart(),l=[];
+  S.students.forEach(function(st){
+    if(!st.dob)return;
+    var b=new Date(st.dob+'T00:00'),bd=new Date(n.getFullYear(),b.getMonth(),b.getDate()),nx=bd<n?new Date(n.getFullYear()+1,b.getMonth(),b.getDate()):bd,days=Math.round((nx-n)/864e5);
+    if(days<=30)l.push({st:st,days:days,age:nx.getFullYear()-b.getFullYear(),date:nx});
+  });
+  if(!l.length)return '';
+  l.sort(function(a,b){return a.days-b.days;});
+  var h='<h2>Birthdays in the next 30 days</h2>';
+  l.forEach(function(x){
+    var ph=phoneOf(x.st),msg='Happy birthday '+x.st.name+'! Wishing you a wonderful year ahead from everyone at the dojo.';
+    h+='<div class="row"><div class="res">🎂</div><div class="who"><b>'+esc(x.st.name)+'</b><small>turns '+x.age+' · '+fmt(x.date)+'</small></div><span class="tag '+(x.days===0?'fine':'soon')+'">'+(x.days===0?'Today':'in '+x.days+(x.days===1?' day':' days'))+'</span>'+(ph?'<a class="btn" target="_blank" rel="noopener" href="https://wa.me/'+ph+'?text='+encodeURIComponent(msg)+'">Wish</a>':'')+'</div>';
+  });
+  return h;
+}
+function medals(st){
+  var c={'1':0,'2':0,'3':0};(st.tours||[]).forEach(function(t){if(c[t.place]!=null)c[t.place]++;});
+  return '<span>🥇 '+c['1']+'</span><span>🥈 '+c['2']+'</span><span>🥉 '+c['3']+'</span>';
+}
+function avatar(st,big){return '<div class="av'+(big?' big':'')+'" style="border-color:'+BELTS[st.belt]+'">'+esc(st.name.trim().charAt(0).toUpperCase())+'</div>';}
+function unpaidOf(st){return feeMonths(st).filter(function(k){return (S.paid[st.id]||[]).indexOf(k)<0;}).reverse();}
+function mlabel(k){return MN[+k.slice(5)-1].slice(0,3)+' '+k.slice(0,4);}
+function chips(u){return '<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">'+u.map(function(k){return '<span class="tag late">'+mlabel(k)+'</span>';}).join('')+'</div>';}
+function unpaidSummary(){
+  var rows='';
+  S.students.forEach(function(st){
+    var u=unpaidOf(st);if(!u.length)return;
+    rows+='<div class="row"><div class="who"><button class="open" style="padding:0;background:none" data-open="'+st.id+'"><b>'+esc(st.name)+'</b></button><small>'+u.length+(u.length===1?' month':' months')+' unpaid · '+money(u.length*(+st.fee))+'</small>'+chips(u)+'</div></div>';
+  });
+  return rows?'<h2>Unpaid months</h2>'+rows:'';
+}
+function unpaidLine(st){
+  var u=unpaidOf(st);
+  if(!u.length)return '<div class="card"><b>All months are paid.</b></div>';
+  return '<div class="card"><b>'+u.length+(u.length===1?' month':' months')+' unpaid · '+money(u.length*(+st.fee))+'</b>'+chips(u)+'</div>';
+}
+function feeIncome(){
+  var all=0,byM={};
+  Object.keys(S.paid).forEach(function(id){var st=find(id);(S.paid[id]||[]).forEach(function(k){var a=S.amt[id+'|'+k];if(a==null)a=st?+st.fee:0;byM[k]=(byM[k]||0)+a;all+=a;});});
+  return {all:all,byM:byM};
+}
+function accHistory(){
+  var fi=feeIncome(),rows=[];
+  Object.keys(fi.byM).forEach(function(k){if(fi.byM[k]>0)rows.push({d:k+'-01',type:'cr',amt:fi.byM[k],note:'Student fees collected · '+mlabel(k),auto:true});});
+  S.ledger.forEach(function(x){rows.push({d:x.date,type:x.type,amt:x.amount,note:x.note,id:x.id});});
+  if(!rows.length)return '<h2>History</h2><div class="empty">No entries yet.</div>';
+  rows.sort(function(a,b){return a.d.localeCompare(b.d);});
+  var bal=0;rows.forEach(function(r){bal+=r.type==='cr'?r.amt:-r.amt;r.bal=bal;});
+  rows.reverse();
+  var h='<h2>History</h2>';
+  rows.forEach(function(r){h+='<div class="row"><div class="who"><b>'+esc(r.note)+'</b><small>'+(r.auto?'Added automatically':fmt(new Date(r.d+'T00:00')))+' · balance '+money(r.bal)+'</small></div><span class="tag '+(r.type==='cr'?'fine':'late')+'">'+(r.type==='cr'?'+':'−')+money(r.amt)+'</span>'+(r.auto?'':'<button class="btn" data-delled="'+r.id+'">Delete</button>')+'</div>';});
+  return h;
+}
+function accView(){
+  var fi=feeIncome(),m=accM,mo=+m.slice(5)-1,y=m.slice(0,4);
+  function sum(l,t){return l.filter(function(x){return x.type===t;}).reduce(function(s,x){return s+x.amount;},0);}
+  var inM=S.ledger.filter(function(x){return x.date.slice(0,7)===m;}).sort(function(a,b){return b.date.localeCompare(a.date);});
+  var feeM=fi.byM[m]||0,oiM=sum(inM,'cr'),drM=sum(inM,'dr'),crM=feeM+oiM;
+  var crAll=fi.all+sum(S.ledger,'cr'),drAll=sum(S.ledger,'dr'),have=crAll-drAll;
+  var h='<div class="card"><small style="color:var(--mute)">Money we have (all time)</small><div class="big-n" style="color:'+(have>=0?'var(--green)':'var(--red)')+'">'+money(have)+'</div><small style="color:var(--mute)">Credited '+money(crAll)+' · Debited '+money(drAll)+'</small></div>';
+  h+='<div class="card"><div class="yr"><button class="btn" data-accm="-1" aria-label="Previous month">‹</button><b>'+MN[mo]+' '+y+'</b><button class="btn" data-accm="1" aria-label="Next month">›</button></div></div>';
+  h+='<div class="stats"><div class="stat"><b class="cr">'+money(crM)+'</b><span>Credit</span></div><div class="stat"><b class="dr">'+money(drM)+'</b><span>Debit</span></div><div class="stat"><b>'+money(crM-drM)+'</b><span>Balance this month</span></div></div>';
+  h+='<h2>This month</h2><div class="row"><div class="res">🥋</div><div class="who"><b>Student fees collected</b><small>Paid fees for '+MN[mo]+', added automatically</small></div><span class="tag fine">+'+money(feeM)+'</span></div>';
+  inM.forEach(function(x){h+='<div class="row"><div class="who"><b>'+esc(x.note)+'</b><small>'+fmt(new Date(x.date+'T00:00'))+'</small></div><span class="tag '+(x.type==='cr'?'fine':'late')+'">'+(x.type==='cr'?'+':'−')+money(x.amount)+'</span><button class="btn" data-delled="'+x.id+'">Delete</button></div>';});
+  h+='<h2>Add entry</h2><form class="card" id="accf"><label>Type<select name="type"><option value="cr">Credit (money in)</option><option value="dr">Debit (money out)</option></select></label><label>Amount (₹)<input name="amount" type="number" min="0" step="any" required></label><label>Date<input name="date" type="date" required value="'+ymd(new Date())+'"></label><label>Note<input name="note" placeholder="Hall rent, belts, trophies" required></label><button class="btn pri full" type="submit">Add entry</button></form>';
+  h+=accHistory();
+  return h;
+}
+function dobSection(st){
+  var h='<h2>Date of birth</h2>';
+  if(!st.dob)return h+'<div class="empty">No date of birth yet. Add it in Student details below.</div>';
+  var b=new Date(st.dob+'T00:00'),n=dayStart(),age=n.getFullYear()-b.getFullYear(),bd=new Date(n.getFullYear(),b.getMonth(),b.getDate());
+  if(bd>n)age--;
+  var next=bd<n?new Date(n.getFullYear()+1,b.getMonth(),b.getDate()):bd,days=Math.round((next-n)/864e5);
+  return h+'<div class="stats"><div class="stat"><b>'+age+'</b><span>Age in years</span></div><div class="stat"><b>'+fmt(b)+'</b><span>Date of birth</span></div><div class="stat"><b>'+(days===0?'Today 🎂':days+(days===1?' day':' days'))+'</b><span>Until next birthday</span></div></div>';
+}
+function feeMonths(st){var out=[],p=st.start.split('-').map(Number),y=p[0],m=p[1],n=new Date(),ey=n.getFullYear(),em=n.getMonth()+1;while(y<ey||(y===ey&&m<=em)){out.push(y+'-'+String(m).padStart(2,'0'));m++;if(m>12){m=1;y++;}}return out.reverse();}
+function feeHistory(st){
+  var now=dayStart(),h='<h2>Fee history</h2>',ms=feeMonths(st);
+  if(!ms.length)return h+'<div class="empty">Fees start from a later month.</div>';
+  ms.forEach(function(k){
+    var y=+k.slice(0,4),m=+k.slice(5)-1,paid=(S.paid[st.id]||[]).indexOf(k)>=0,due=new Date(y,m,st.day),late=Math.round((now-due)/864e5);
+    h+='<div class="row"><div class="who"><b>'+MN[m]+' '+y+'</b><small>'+money(st.fee)+' · due '+fmt(due)+'</small></div>'+(paid?'<span class="tag fine">Paid</span>':badge(late))+(!paid&&st.phone&&late>=-3?'<a class="btn" target="_blank" rel="noopener" href="'+waLink(st,{m:m,due:due,late:late})+'" data-rem="'+st.id+'|'+k+'">Remind</a><a class="btn" target="_blank" rel="noopener" href="'+smsLink(st,{m:m,due:due,late:late})+'" data-rem="'+st.id+'|'+k+'">SMS</a>':'')+'<button class="btn'+(paid?'':' ok')+'" data-tog="'+st.id+'|'+k+'">'+(paid?'Mark unpaid':'Mark paid')+'</button></div>';
+  });
+  return h;
+}
+function attStat(st,y,m){var held=0,att=0;Object.keys(S.att).forEach(function(d){if(+d.slice(0,4)!==y)return;if(m!=null&&+d.slice(5,7)-1!==m)return;held++;if(S.att[d].indexOf(st.id)>=0)att++;});return {held:held,att:att,pct:held?Math.round(att/held*100):0};}
+function attSection(st){
+  var now=new Date(),cm=attStat(st,now.getFullYear(),now.getMonth()),yr=attStat(st,attYear,null),all=Object.keys(S.att).filter(function(d){return S.att[d].indexOf(st.id)>=0;}).length;
+  var h='<h2>Attendance</h2><div class="stats"><div class="stat"><b>'+cm.pct+'%</b><span>'+MN[now.getMonth()]+' · '+cm.att+' of '+cm.held+' classes</span></div><div class="stat"><b>'+yr.pct+'%</b><span>'+attYear+' · '+yr.att+' of '+yr.held+' classes</span></div><div class="stat"><b>'+all+'</b><span>Classes attended, all time</span></div></div>';
+  h+='<div class="card" style="margin-top:10px"><div class="yr"><button class="btn" data-yr="-1" aria-label="Previous year">‹</button><b>'+attYear+'</b><button class="btn" data-yr="1" aria-label="Next year">›</button></div><div class="bars">';
+  for(var i=0;i<12;i++){var s=attStat(st,attYear,i);h+='<div class="bc"><div class="bt"><i style="height:'+s.pct+'%"></i></div><span>'+MN[i].slice(0,3)+'</span><span>'+s.att+'/'+s.held+'</span></div>';}
+  return h+'</div></div>';
+}
+function render(){
+  document.querySelectorAll('nav button').forEach(function(b){b.setAttribute('aria-selected',b.dataset.t===tab&&!sel);});
+  var v=document.getElementById('view');
+  v.innerHTML=sel?detailView():tab==='fees'?feesView():tab==='students'?studentsView():tab==='acc'?accView():attView();
+}
+function feesView(){
+  var list=[],total=0,overdue=0,soon=0;
+  S.students.forEach(function(st){
+    total+=remainingOf(st);
+    pending(st).forEach(function(pd){list.push({st:st,pd:pd});if(pd.late>=0)overdue++;else soon++;});
+  });
+  list.sort(function(a,b){return b.pd.late-a.pd.late;});
+  var h='<div class="stats"><div class="stat"><b>'+money(total)+'</b><span>Fees remaining</span></div><div class="stat"><b>'+overdue+'</b><span>Due or overdue</span></div><div class="stat"><b>'+soon+'</b><span>Due in 3 days</span></div></div>'+queueHtml()+unpaidSummary()+'<h2>Fees to collect</h2>';
+  if(!list.length)h+='<div class="empty">'+(S.students.length?'No pending fees. Everyone is up to date.':'Add your first student in the Students tab.')+'</div>';
+  list.forEach(function(x){
+    var st=x.st,pd=x.pd,last=S.rem[st.id+'|'+pd.key];
+    h+='<div class="row">'+avatar(st)+'<div class="who"><button class="open" style="padding:0;background:none" data-open="'+st.id+'"><b>'+esc(st.name)+'</b></button><small>'+MN[pd.m]+' · '+money(st.fee)+' · due '+fmt(pd.due)+(last?' · reminded '+last:'')+'</small><div style="margin-top:4px">'+badge(pd.late)+'</div></div><div class="acts">'+
+    (st.phone?'<a class="btn pri" target="_blank" rel="noopener" href="'+waLink(st,pd)+'" data-rem="'+st.id+'|'+pd.key+'">Send reminder</a>':'<span class="tag soon">No phone</span>')+
+    (st.phone?'<a class="btn" target="_blank" rel="noopener" href="'+smsLink(st,pd)+'" data-rem="'+st.id+'|'+pd.key+'">SMS</a>':'')+'<button class="btn" data-copy="'+esc(msgOf(st,pd))+'">Copy message</button>'+'<button class="btn ok" data-paid="'+st.id+'|'+pd.key+'">Mark paid</button></div></div>';
+  });
+  return h;
+}
+function studentsView(){
+  var h='<form class="card" id="addf"><label class="full">Student name<input name="name" required></label>'+
+  '<label>Belt<select name="belt">'+Object.keys(BELTS).map(function(b){return '<option>'+b+'</option>';}).join('')+'</select></label>'+
+  '<label>Parent phone<input name="phone" inputmode="tel" placeholder="10-digit number"></label>'+
+  '<label>Monthly fee (₹)<input name="fee" type="number" min="0" required></label>'+
+  '<label>Due day of month<input name="day" type="number" min="1" max="28" value="5" required></label><label>Date of birth<input name="dob" type="date"></label>'+
+  '<button class="btn pri full" type="submit">Add student</button></form>'+bdayList()+'<h2>'+S.students.length+' students</h2>';
+  if(!S.students.length)h+='<div class="empty">No students yet. Add one above.</div>';
+  S.students.forEach(function(st){
+    var r=remainingOf(st);
+    h+='<button class="row open" data-open="'+st.id+'">'+avatar(st)+'<span class="who"><b>'+esc(st.name)+'</b><small><span class="belt" style="background:'+BELTS[st.belt]+'"></span>'+st.belt+' belt · '+(st.tours||[]).length+' tournaments</small></span><span class="tag '+(r>0?'late':'fine')+'">'+(r>0?(st.owed!=null?'':unpaidOf(st).length+' mo · ')+money(r)+' due':'Paid up')+'</span></button>';
+  });
+  return h;
+}
+function detailView(){
+  var st=find(sel);if(!st){sel=null;return studentsView();}
+  var ps=pending(st),auto=unpaidOf(st).length*(+st.fee),r=remainingOf(st);
+  var n=Object.keys(S.att).filter(function(d){return S.att[d].indexOf(st.id)>=0;}).length;
+  var h='<button class="btn back" data-back="1">← All students</button>';
+  h+='<div class="card" style="display:flex;gap:14px;align-items:center">'+avatar(st,true)+'<div><div style="font-size:1.3rem;font-weight:800">'+esc(st.name)+'</div><small style="color:var(--mute)"><span class="belt" style="background:'+BELTS[st.belt]+'"></span>'+st.belt+' belt · '+n+' classes attended</small><div class="medals">'+medals(st)+'</div></div></div>';
+  h+=dobSection(st);
+  h+='<h2>Fees</h2><div class="card"><div class="big-n" style="color:'+(r>0?'var(--red)':'var(--green)')+'">'+money(r)+'</div><small style="color:var(--mute)">remaining · monthly fee '+money(st.fee)+', due on the '+st.day+'</small>'+
+  '<div class="inl" style="margin-top:12px"><label class="f">Edit fees remaining (₹)<input id="remf" type="number" min="0" value="'+r+'"></label><button class="btn pri" data-saverem="1">Save</button></div>'+
+  (st.owed!=null?'<p style="margin:8px 0 0"><button class="btn" data-autorem="1">Use automatic amount ('+money(auto)+')</button></p>':'')+'</div>';
+  h+=unpaidLine(st);h+=feeHistory(st);
+  [].forEach(function(pd){
+    h+='<div class="row"><div class="who"><b>'+MN[pd.m]+' · '+money(st.fee)+'</b><small>due '+fmt(pd.due)+'</small></div>'+badge(pd.late)+(st.phone?'<a class="btn" target="_blank" rel="noopener" href="'+waLink(st,pd)+'" data-rem="'+st.id+'|'+pd.key+'">Remind</a>':'')+'<button class="btn ok" data-paid="'+st.id+'|'+pd.key+'">Mark paid</button></div>';
+  });
+  h+=attSection(st);
+  h+='<h2>Tournaments</h2><form class="card" id="tourf"><label class="full">Tournament name<input name="name" required></label><label>Date<input name="date" type="date" required value="'+ymd(new Date())+'"></label><label>Category<select name="type"><option>Kumite</option><option>Kata</option><option>Both</option></select></label><label class="full">Place secured<select name="place">'+Object.keys(PLACE).map(function(k){return '<option value="'+k+'">'+PLACE[k]+'</option>';}).join('')+'</select></label><button class="btn pri full" type="submit">Add tournament</button></form>';
+  var t=(st.tours||[]).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+  if(!t.length)h+='<div class="empty">No tournaments recorded yet.</div>';
+  t.forEach(function(x){h+='<div class="row"><div class="res">'+PLACE[x.place].split(' ')[0]+'</div><div class="who"><b>'+esc(x.name)+'</b><small>'+x.type+' · '+fmt(new Date(x.date+'T00:00'))+' · '+(x.place==='P'?'Participated':PLACE[x.place].slice(3))+'</small></div><button class="btn" data-deltour="'+x.id+'">Delete</button></div>';});
+  h+='<h2>Student details</h2><form class="card" id="editf"><label class="full">Name<input name="name" required value="'+esc(st.name)+'"></label><label>Belt<select name="belt">'+Object.keys(BELTS).map(function(b){return '<option'+(b===st.belt?' selected':'')+'>'+b+'</option>';}).join('')+'</select></label><label>Parent phone<input name="phone" inputmode="tel" value="'+esc(st.phone)+'"></label><label>Monthly fee (₹)<input name="fee" type="number" min="0" required value="'+st.fee+'"></label><label>Due day of month<input name="day" type="number" min="1" max="28" required value="'+st.day+'"></label><label>Fees counted from<input name="start" type="month" required value="'+st.start+'"></label><label>Date of birth<input name="dob" type="date" value="'+esc(st.dob)+'"></label><button class="btn pri" type="submit">Save changes</button><button class="btn" type="button" data-del="'+st.id+'">Remove student</button></form>';
+  return h;
+}
+function attView(){
+  var ids=S.att[attDate]||[];
+  var h='<form class="card" onsubmit="return false"><label class="full">Class date<input type="date" id="attd" value="'+attDate+'"></label></form><h2>'+ids.length+' of '+S.students.length+' present</h2>';
+  if(!S.students.length)h+='<div class="empty">Add students first to take attendance.</div>';
+  S.students.forEach(function(st){
+    h+='<label class="row chk">'+avatar(st)+'<span class="who"><b>'+esc(st.name)+'</b><small>'+st.belt+' belt</small></span><input type="checkbox" data-att="'+st.id+'"'+(ids.indexOf(st.id)>=0?' checked':'')+'></label>';
+  });
+  return h;
+}
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-accm],[data-delled],[data-copy],[data-qstart],[data-qskip],[data-qquit],[data-qsend],[data-t],[data-tog],[data-yr],[data-paid],[data-del],[data-open],[data-back],[data-rem],[data-saverem],[data-autorem],[data-deltour]');if(!t)return;
+  var d=t.dataset,st=sel?find(sel):null;
+  if(d.t){tab=d.t;sel=null;render();return;}
+  if(d.open){sel=d.open;render();window.scrollTo(0,0);return;}
+  if(d.back){sel=null;tab='students';render();return;}
+  if(d.rem){S.rem[d.rem]=fmt(new Date());save();setTimeout(render,300);return;}
+  if(d.accm){var pm=accM.split('-').map(Number);accM=ymd(new Date(pm[0],pm[1]-1+(+d.accm),1)).slice(0,7);render();return;}
+  if(d.delled){S.ledger=S.ledger.filter(function(x){return x.id!==d.delled;});save();render();return;}
+  if(d.copy){copyText(d.copy,t);return;}
+  if(d.qstart){var td=fmt(new Date());queue=dueList().filter(function(x){return x.st.phone&&S.rem[x.st.id+'|'+x.pd.key]!==td;});qi=0;render();return;}
+  if(d.qskip){qi++;render();return;}
+  if(d.qquit){queue=[];qi=0;render();return;}
+  if(d.qsend){S.rem[d.qsend]=fmt(new Date());qi++;save();setTimeout(render,300);return;}
+  if(d.yr){attYear+=+d.yr;render();return;}
+  if(d.tog){var q=d.tog.split('|'),s2=find(q[0]),a=S.paid[q[0]]=S.paid[q[0]]||[],ix=a.indexOf(q[1]);if(ix>=0){a.splice(ix,1);delete S.amt[d.tog];if(s2&&s2.owed!=null)s2.owed=+s2.owed+(+s2.fee);}else{a.push(q[1]);S.amt[d.tog]=s2?+s2.fee:0;if(s2&&s2.owed!=null)s2.owed=Math.max(0,+s2.owed-(+s2.fee));}save();render();return;}
+  if(d.paid){var p=d.paid.split('|'),s=find(p[0]);(S.paid[p[0]]=S.paid[p[0]]||[]).push(p[1]);S.amt[d.paid]=s?+s.fee:0;if(s&&s.owed!=null)s.owed=Math.max(0,+s.owed-(+s.fee));save();render();return;}
+  if(d.saverem&&st){var v=document.getElementById('remf').value;st.owed=Math.max(0,+v||0);save();render();return;}
+  if(d.autorem&&st){delete st.owed;save();render();return;}
+  if(d.deltour&&st){st.tours=(st.tours||[]).filter(function(x){return x.id!==d.deltour;});save();render();return;}
+  if(d.del){if(confirm('Remove this student and their records?')){S.students=S.students.filter(function(s){return s.id!==d.del;});sel=null;save();render();}}
+});
+document.addEventListener('submit',function(e){
+  var id=e.target.id;if(['addf','editf','tourf','accf'].indexOf(id)<0)return;e.preventDefault();
+  var f=new FormData(e.target),st=sel?find(sel):null;
+  if(id==='addf'){S.students.push({id:'s'+Date.now(),name:f.get('name').trim(),belt:f.get('belt'),phone:f.get('phone').trim(),fee:+f.get('fee'),day:Math.min(28,Math.max(1,+f.get('day'))),start:ymd(new Date()).slice(0,7),dob:f.get('dob')||'',tours:[]});}
+  if(id==='editf'&&st){st.name=f.get('name').trim();st.belt=f.get('belt');st.phone=f.get('phone').trim();st.fee=+f.get('fee');st.day=Math.min(28,Math.max(1,+f.get('day')));if(f.get('start'))st.start=f.get('start');st.dob=f.get('dob')||'';}
+  if(id==='accf'){S.ledger.push({id:'l'+Date.now(),date:f.get('date'),type:f.get('type'),amount:Math.max(0,+f.get('amount')||0),note:f.get('note').trim()});}
+  if(id==='tourf'&&st){(st.tours=st.tours||[]).push({id:'t'+Date.now(),name:f.get('name').trim(),date:f.get('date'),type:f.get('type'),place:f.get('place')});}
+  save();render();
+});
+document.addEventListener('change',function(e){
+  if(e.target.id==='attd'){attDate=e.target.value||ymd(new Date());render();return;}
+  if(e.target.dataset.att){
+    var a=S.att[attDate]||[],id=e.target.dataset.att;
+    a=e.target.checked?a.concat(id):a.filter(function(x){return x!==id;});
+    S.att[attDate]=a;save();render();
+  }
+});
+render();
+</script>
+</body>
+</html>
